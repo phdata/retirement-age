@@ -1,7 +1,6 @@
-![Retirement Age](./retirement-age.png)
 
 <p align="center">
-  <img src="retirement-age.png" alt="retirement-age.png" width="128" height="128"/>
+  <img src="retirement-age.png" alt="retirement-age.png" />
 
 
   <h3 align="center"></h3>
