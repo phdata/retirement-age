@@ -97,18 +97,18 @@ An example:
 - qualifiedTableName: codb.users
   recordsRemoved: true
   originalDataset:
-    location: file:/data/codb/users
+    location: hdfs://data/codb/users
     count: 123422
   newDataset:
-    location: file:/data/codb/users_ra
+    location: hdfs://data/codb/users_ra
     count: 114322
 - qualifiedTableName: codb.web
   recordsRemoved: true
   originalDataset:
-    location: file:/data/codb/web
+    location: hdfs://data/codb/web
     count: 45623345
   newDataset:
-    location: file:/data/codb/web_ra
+    location: hdfs://data/codb/web_ra
     count: 41345545   
 
 ```
