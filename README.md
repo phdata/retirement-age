@@ -1,5 +1,21 @@
 ![Retirement Age](./retirement-age.png)
 
+<p align="center">
+  <img src="retirement-age.png" alt="retirement-age.png" width="128" height="128"/>
+
+
+  <h3 align="center"></h3>
+
+  <p align="center">
+    Hadoop Data Lifecycle Automation
+    <br>
+
+  </p>
+</p>
+
+<br>
+
+
 # Retirement Age
 The Retirement Age data-lifecycle application is used to remove dataset records past 
 an expiration date. Retirement age currently works with Parquet using the Hive Metastore.
