@@ -1,0 +1,23 @@
+global: options
+databases:
+  - database_name: database1
+    tables:
+      - table_name: parquet1
+        storage_type: parquet
+        expiration_column: col1
+      - table_name: kudu1
+        storage_type: kudu
+        expiration_column: col1
+        linked_tables:
+        - table_name: dim1
+           storage_type: parquet
+           join_keys:
+             parent: id1
+             self: id1
+        - table_name: dim2
+           storage_type: parquet
+           join_keys:
+             parent: id1
+             self: id1
+
+
