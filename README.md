@@ -1,3 +1,4 @@
+![Travis Build Tag](https://travis-ci.org/phdata/retirement-age.svg?branch=master)
 
 <p align="center">
   <img src="retirement-age.png" alt="retirement-age.png" />
