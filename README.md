@@ -86,7 +86,7 @@ Retirement age uses a yamlconfiguration file 'retirement-age.yml'
 databases: // list of databases
   - name: database1 // name of database
     tables: // list of tables
-      - name: fact1 // REQUIRED name of table (required)
+      - name: fact1 // REQUIRED name of table
         storage_type: parquet // REQUIRED type of storage (currently only supports non-kudu Hive/Impala tables)
         expiration_column: col1 // REQUIRED Date column to compare for record removal. This can be a Date, Timestamp, Unix time seconds and Unix time milliseconds, and String 
         expiration_days: 100 // REQUIRED number of days from the date in `expiration_column` that the record will be removed
