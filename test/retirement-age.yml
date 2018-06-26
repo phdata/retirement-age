@@ -19,5 +19,3 @@ databases:
            join_keys:
              parent: id1
              self: id1
-
-
