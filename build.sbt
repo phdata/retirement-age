@@ -20,7 +20,7 @@ lazy val root = (project in file("."))
     scalafmtVersion := "1.2.0"
   )
 
-val sparkVersion     = "2.1.0.cloudera2"
+val sparkVersion     = "2.2.0.cloudera1"
 val scalaTestVersion = "3.0.4"
 
 parallelExecution in Test := false
