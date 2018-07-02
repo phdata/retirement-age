@@ -108,8 +108,7 @@ trait HdfsStorage extends StorageActions with LazyLogging {
   }
 
   def getCurrentDatasetLocation(qualifiedTableName: String) = {
-    // Spark 2.2.0 implementation for Location
-    // Returns qualifiedTableName directory location using Spark 2.2 syntax
+    // spark2.2+ dataframe schema
     val details: DataFrame = spark.sql(s"describe extended $qualifiedTableName")
 
     details.filter(col("col_name") === "Location").select("data_type").collect().head.getString(0)
