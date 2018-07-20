@@ -17,7 +17,7 @@
 
 
 # Retirement Age
-The Retirement Age data-lifecycle application is used to remove dataset records past 
+The Retirement Age data-lifecycle application is used to remove dataset records past
 an expiration date. Retirement age currently works with Parquet using the Hive Metastore.
 
 ## How it works
@@ -37,7 +37,7 @@ filtered data to a new location, the second time to move it back to the original
 the original data.
 
 Datasets with records that don't have a expiration time can be removed if they can be linked to a
-record that does have an expiration. For example, if you have a fact table with a foriegn key to a
+record that does have an expiration. For example, if you have a fact table with a foreign key to a
 dimension table, and the fact table record has a record removed, Retirement Age will make the join
 to the dimension table and remove the dimension table record. See the `related_tables`
 section in the yaml example below. `related tables` need a join key instead of an expiration column
@@ -138,6 +138,24 @@ $ sbt test
 Create a fat jar
 ```bash
 $ sbt assembly
+```
+
+# RetirementAge - LoadGenerator
+LoadGenerator is an application used to create test data to be used as a load test for RetirementAge.
+
+## How it works
+This application creates three tables: a fact-table, dimension-table, and subdimension-table.
+The fact-table is dated, while the dimension-table has a key to join onto the fact-table.
+The subdimension-table has a key to join onto the dimension-table.
+This test data can then be used on Retirement-Age.
+
+## Running the application
+LoadGenerator requires you to input the number of records to create for all three tables, and the database name.
+The names for the fact,dimension, and subdimension tables are optional. If no name is specified for the three tables
+then it will use the default names which are: factloadtest, dimloadtest, and subloadtest.
+```bash
+spark2-submit --deploy-mode client --master yarn --class io.phdata.retirementage.loadgen.LoadGenerator <path-to-jar> \
+--fact-count <#> --dimension-count <#> --subdimension-count <#> --database-name <name> --fact-name <name> --dim-name <name> --subdim-name <name>
 ```
 
 ## Roadmap
