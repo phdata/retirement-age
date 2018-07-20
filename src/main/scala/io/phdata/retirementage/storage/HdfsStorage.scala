@@ -21,6 +21,8 @@ import io.phdata.retirementage.SparkDriver.spark
 import io.phdata.retirementage.domain._
 import org.apache.spark.sql._
 import org.apache.spark.sql.functions._
+import com.databricks.spark.avro._
+
 
 /**
   * Handles removing data from HDFS
@@ -35,7 +37,7 @@ trait HdfsStorage extends StorageActions with LazyLogging {
                             filteredFrame: DataFrame) = {
     try {
       val originalDatasetLocation = getCurrentDatasetLocation(qualifiedTableName)
-      val newDatasetLocation      = getNewDatasetLocation(qualifiedTableName)
+      val newDatasetLocation = getNewDatasetLocation(qualifiedTableName)
 
       val currentDatasetCount = if (computeCountsFlag) Some(currentFrame.count()) else None
 
@@ -51,6 +53,8 @@ trait HdfsStorage extends StorageActions with LazyLogging {
         storageType match {
           case "parquet" =>
             coalescedFrame.write.mode(SaveMode.Overwrite).parquet(newDatasetLocation)
+          case "avro" =>
+            coalescedFrame.write.mode(SaveMode.Overwrite).avro(newDatasetLocation)
           case _ =>
             RetirementReport(
               qualifiedTableName,
@@ -76,10 +80,10 @@ trait HdfsStorage extends StorageActions with LazyLogging {
       case e: Exception => {
         logger.error(s"exception writing $qualifiedTableName", e)
         RetirementReport(qualifiedTableName,
-                         false,
-                         DatasetReport(getCurrentDatasetLocation(qualifiedTableName)),
-                         None,
-                         Some(e.getMessage))
+          false,
+          DatasetReport(getCurrentDatasetLocation(qualifiedTableName)),
+          None,
+          Some(e.getMessage))
       }
     }
   }
@@ -87,7 +91,7 @@ trait HdfsStorage extends StorageActions with LazyLogging {
   def alterLocation(qualifiedTableName: String) = {
 
     val originalDatasetLocation = getCurrentDatasetLocation(qualifiedTableName)
-    val newDatasetLocation      = getNewDatasetLocation(qualifiedTableName)
+    val newDatasetLocation = getNewDatasetLocation(qualifiedTableName)
 
     spark.sql(s"alter table $qualifiedTableName set location '$newDatasetLocation'")
 
@@ -120,7 +124,7 @@ trait HdfsStorage extends StorageActions with LazyLogging {
 
   override def undo(qualifiedTableName: String): RetirementReport = {
     val originalDatasetLocation = getCurrentDatasetLocation(qualifiedTableName)
-    val newDatasetLocation      = getNewDatasetLocation(qualifiedTableName)
+    val newDatasetLocation = getNewDatasetLocation(qualifiedTableName)
 
     alterLocation(qualifiedTableName)
 

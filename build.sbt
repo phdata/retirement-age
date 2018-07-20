@@ -35,5 +35,6 @@ val otherDependencies = Seq(
   "net.jcazevedo"              %% "moultingyaml"  % "0.4.0",
   "com.google.guava"           % "guava"          % "21.0",
   "com.typesafe.scala-logging" %% "scala-logging" % "3.7.2",
-  "org.scalatest"              %% "scalatest"     % "3.0.4" % "test"
+  "org.scalatest"              %% "scalatest"     % "3.0.4" % "test",
+  "com.databricks"             %% "spark-avro"    % "4.0.0"
 ).map(_.excludeAll(ExclusionRule(organization = "com.fasterxml.jackson.core")))

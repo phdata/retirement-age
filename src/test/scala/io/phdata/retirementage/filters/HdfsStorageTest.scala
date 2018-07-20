@@ -16,12 +16,13 @@
 
 package io.phdata.retirementage.filters
 
-import io.phdata.retirementage.domain.{Database, DatedTable}
+import io.phdata.retirementage.domain.{Database, DatasetReport, DatedTable, RetirementReport}
 import io.phdata.retirementage.storage.HdfsStorage
 import io.phdata.retirementage.{SparkTestBase, TestObjects}
-import org.apache.spark.sql.SaveMode
+import org.apache.spark.sql.{DataFrame, SaveMode}
 import org.apache.spark.sql.types.{LongType, StructField, StructType}
 import org.scalatest.FunSuite
+import com.databricks.spark.avro._
 
 class HdfsStorageTest extends FunSuite with SparkTestBase {
 
@@ -185,4 +186,38 @@ class HdfsStorageTest extends FunSuite with SparkTestBase {
         .getOrElse(throw new Exception("properties not found")))
   }
 
+  test("write avro table") {
+    val table    = DatedTable("tableb", "avro", "date", 1, None, None, None)
+    val database = Database("default", Seq(table))
+    val schema   = StructType(StructField("date", LongType, false) :: Nil)
+    val data     = TestObjects.smallDatasetSeconds
+
+    val df       = createDataFrame(data, schema)
+    val location = s"target/test-tables/${database.name}.${table.name}"
+
+    df.write.format("com.databricks.spark.avro").mode(SaveMode.Overwrite).saveAsTable(s"${database.name}.${table.name}")
+
+    val temp = getPersistFrame(database, table, df)
+
+    val retireReport = temp.persistFrame(true,
+                                         false,
+                                         temp.qualifiedTableName,
+                                         "avro",
+                                         temp.currentFrame,
+                                         temp.filteredFrame())
+    assert(retireReport.originalDataset.location.contains("tableb"))
+    assert(retireReport.newDataset.get.location.contains("tableb_ra"))
+  }
+
+  def getPersistFrame(database: Database, table: DatedTable, frame: DataFrame) = {
+    class TestTableMaker(database: Database, table: DatedTable)
+      extends DatedTableFilter(database, table)
+        with HdfsStorage {
+
+      override lazy val currentFrame: DataFrame = frame
+
+    }
+
+    new TestTableMaker(database, table)
+  }
 }

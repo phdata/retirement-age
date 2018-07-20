@@ -40,7 +40,7 @@ object SparkDriver extends LazyLogging {
 
     config.databases.flatMap { database =>
       database.tables.flatMap { table =>
-        val hold                = table.hold.map(_.active).getOrElse(false)
+        val hold = table.hold.map(_.active).getOrElse(false)
         val filter: TableFilter = getFilter(database, table)
 
         try {
@@ -67,6 +67,7 @@ object SparkDriver extends LazyLogging {
   def getFilter(database: Database, table: DatedTable) = {
     table.storage_type match {
       case "parquet" => new DatedTableFilter(database, table) with HdfsStorage
+      case "avro" => new DatedTableFilter(database, table) with HdfsStorage
       // case "kudu" => new DatedTableFilter(database, table) with KuduStorage
       case _ => throw new NotImplementedError()
     }
