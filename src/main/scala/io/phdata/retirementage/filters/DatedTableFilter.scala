@@ -29,8 +29,7 @@ import scala.util.{Failure, Success, Try}
   * @inheritdoc
   */
 abstract class DatedTableFilter(database: Database, table: DatedTable)
-    extends TableFilter(database, table)
-    with StorageActions {
+    extends TableFilter(database, table) {
   lazy val dateExpression: Column =
     getDateExpression(currentFrame, table.expiration_column, table.date_format_string)
 

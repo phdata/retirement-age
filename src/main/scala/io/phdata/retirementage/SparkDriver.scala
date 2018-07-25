@@ -18,8 +18,8 @@ package io.phdata.retirementage
 
 import com.typesafe.scalalogging.LazyLogging
 import io.phdata.retirementage.domain.{Config, Database, DatedTable, RetirementReport}
-import io.phdata.retirementage.filters.{DatedTableFilter, ChildTableFilter, TableFilter}
-import io.phdata.retirementage.storage.HdfsStorage
+import io.phdata.retirementage.filters.{ChildTableFilter, DatedTableFilter, TableFilter}
+import io.phdata.retirementage.storage.{HdfsStorage, KuduStorage}
 import org.apache.spark.sql.SparkSession
 
 object SparkDriver extends LazyLogging {
@@ -68,7 +68,7 @@ object SparkDriver extends LazyLogging {
     table.storage_type match {
       case "parquet" => new DatedTableFilter(database, table) with HdfsStorage
       case "avro" => new DatedTableFilter(database, table) with HdfsStorage
-      // case "kudu" => new DatedTableFilter(database, table) with KuduStorage
+      case "kudu" => new DatedTableFilter(database, table) with KuduStorage
       case _ => throw new NotImplementedError()
     }
   }

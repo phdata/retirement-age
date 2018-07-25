@@ -22,8 +22,6 @@ import io.phdata.retirementage.domain._
 import io.phdata.retirementage.storage.{HdfsStorage, StorageActions}
 import org.apache.spark.sql.DataFrame
 
-import scala.util.Try
-
 /**
   * Parent abstract class for a dataset filter. A dataset filter can
   *
