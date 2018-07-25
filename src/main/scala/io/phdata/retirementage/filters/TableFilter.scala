@@ -19,7 +19,7 @@ package io.phdata.retirementage.filters
 import com.typesafe.scalalogging.LazyLogging
 import io.phdata.retirementage.SparkDriver.spark
 import io.phdata.retirementage.domain._
-import io.phdata.retirementage.storage.{HdfsStorage, StorageActions}
+import io.phdata.retirementage.storage.{HdfsStorage, KuduStorage, StorageActions}
 import org.apache.spark.sql.DataFrame
 
 /**
@@ -98,7 +98,12 @@ abstract class TableFilter(database: Database, table: Table)
     } else {
 
       val childrenResults = table.child_tables.toSeq.flatten.flatMap { child =>
-        val childFilter = new ChildTableFilter(database, child, this) with HdfsStorage
+        val childFilter = child.storage_type match {
+          case "parquet" => new ChildTableFilter(database, child, this) with HdfsStorage
+          case "avro" => new ChildTableFilter(database, child, this) with HdfsStorage
+          case "kudu" => new ChildTableFilter(database, child, this) with KuduStorage
+          case _ => throw new NotImplementedError()
+        }
 
         childFilter.doFilter(computeCountsFlag, dryRun)
 
@@ -142,5 +147,4 @@ abstract class TableFilter(database: Database, table: Table)
     * @return <code>DataFrame</code> of expired records
     */
   def expiredRecords(): DataFrame
-
 }
