@@ -19,10 +19,9 @@ package io.phdata.retirementage.filters
 import com.typesafe.scalalogging.LazyLogging
 import io.phdata.retirementage.SparkDriver.spark
 import io.phdata.retirementage.domain._
-import io.phdata.retirementage.storage.{HdfsStorage, StorageActions}
+import io.phdata.retirementage.storage.{HdfsStorage, KuduStorage, StorageActions}
 import org.apache.spark.sql.DataFrame
-
-import scala.util.Try
+import org.apache.kudu.spark.kudu._
 
 /**
   * Parent abstract class for a dataset filter. A dataset filter can
@@ -33,8 +32,22 @@ import scala.util.Try
 abstract class TableFilter(database: Database, table: Table)
     extends StorageActions
     with LazyLogging {
-  lazy val currentFrame  = spark.read.table(qualifiedTableName).cache()
-  val qualifiedTableName = s"${database.name}.${table.name}"
+
+  lazy val currentFrame: DataFrame = getCurrentFrame(qualifiedTableName)
+  val qualifiedTableName: String   = setQualifiedName(database, table)
+
+  /**
+    * Returns the qualified table name for a given database and table.
+    * The database name will be empty when working with Kudu tables
+    * which do not belong to a database.
+    */
+  def setQualifiedName(database: Database, table: Table): String = {
+    if (database.name.equals("")) {
+      table.name
+    } else {
+      s"${database.name}.${table.name}"
+    }
+  }
 
   /**
     * Count of the dataset after records have been removed
@@ -100,18 +113,32 @@ abstract class TableFilter(database: Database, table: Table)
     } else {
 
       val childrenResults = table.child_tables.toSeq.flatten.flatMap { child =>
-        val childFilter = new ChildTableFilter(database, child, this) with HdfsStorage
+        val childFilter = child.storage_type match {
+          case "parquet" => new ChildTableFilter(database, child, this) with HdfsStorage
+          case "avro"    => new ChildTableFilter(database, child, this) with HdfsStorage
+          case "kudu"    => new ChildTableFilter(database, child, this) with KuduStorage
+          case _         => throw new NotImplementedError()
+        }
 
         childFilter.doFilter(computeCountsFlag, dryRun)
 
       }
-
-      val thisResult = persistFrame(computeCountsFlag,
-                                    dryRun,
-                                    qualifiedTableName,
-                                    table.storage_type,
-                                    currentFrame,
-                                    filteredFrame())
+      val thisResult = this match {
+        case _: KuduStorage =>
+          removeRecords(computeCountsFlag,
+                        dryRun,
+                        qualifiedTableName,
+                        table.storage_type,
+                        getCurrentFrame(qualifiedTableName),
+                        expiredRecords())
+        case _: HdfsStorage =>
+          removeRecords(computeCountsFlag,
+                        dryRun,
+                        qualifiedTableName,
+                        table.storage_type,
+                        getCurrentFrame(qualifiedTableName),
+                        filteredFrame())
+      }
 
       Seq(thisResult) ++ childrenResults
     }
@@ -144,5 +171,4 @@ abstract class TableFilter(database: Database, table: Table)
     * @return <code>DataFrame</code> of expired records
     */
   def expiredRecords(): DataFrame
-
 }

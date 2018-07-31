@@ -16,8 +16,8 @@
 
 package io.phdata.retirementage.filters
 
-import io.phdata.retirementage.domain.{Database, ChildTable}
-import io.phdata.retirementage.storage.HdfsStorage
+import io.phdata.retirementage.domain.{ChildTable, Database}
+import io.phdata.retirementage.storage.{HdfsStorage, StorageActions}
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.col
 
@@ -26,9 +26,8 @@ import org.apache.spark.sql.functions.col
   * @inheritdoc
   * @param parent The parent dataset that is joined from
   */
-class ChildTableFilter(database: Database, table: ChildTable, parent: TableFilter)
-    extends TableFilter(database, table)
-    with HdfsStorage {
+abstract class ChildTableFilter(database: Database, table: ChildTable, parent: TableFilter)
+    extends TableFilter(database, table) {
 
   override def filteredFrame = {
     val joinKeys = table.join_on

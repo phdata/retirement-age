@@ -17,3 +17,7 @@
 package io.phdata.retirementage.domain
 
 case class Config(kudu_masters: Option[List[String]], databases: List[Database])
+
+object GlobalConfig {
+  var kuduMasters: Option[List[String]] = null
+}

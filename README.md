@@ -140,6 +140,56 @@ Create a fat jar
 $ sbt assembly
 ```
 
+# RetirementAge - Kudu
+The Retirement Age application handles filtering records, with an expired column, from a Kudu table.
+
+## How it works
+RetirementAge - Kudu works very similarly to RetirementAge.
+Kudu implementation uses Kudu's spark API to read Kudu tables. Based on an expiration column this
+application will filter out all records that are past their expiration date. You can expect to use
+this similarly to how you would filter out a parquet, or avro table.
+
+## Configuration File
+It is necessary to specify at least one Kudu Master in the configuration file. It is not necessary
+to specify a database for a Kudu table. If you created the Kudu table in Impala you will have to
+specify the database (ex. impala::database1.table1), but if the Kudu table is not connected to any
+database then you would not define a database. In order to not define a database you would input
+an empty string for the database name denoted as '' which is shown in the example below.
+
+```yaml
+kudu_masters:
+  - kuduMaster1
+  - kuduMaster2
+  - kuduMaster3
+databases:
+  - name: database1
+    tables:
+      - name: fact1
+        storage_type: kudu
+        expiration_column: col1
+        expiration_days: 100
+        hold: false
+        date_format_string: 'yyyy-MM-dd'
+        child_tables:
+          - name: parquet2
+            storage_type: kudu
+            join_on:
+              parent: col1
+              self: col1
+  - name: ''
+    tables:
+      - name: fact2
+        storage_type: kudu
+        expiration_column: col1
+        expiration_days: 100
+        hold: false
+        date_format_string: 'yyyy-MM-dd'
+
+```
+
+## Known Issues
+- You cannot match a parent table to a child table on columns with the same name
+
 # RetirementAge - LoadGenerator
 LoadGenerator is an application used to create test data to be used as a load test for RetirementAge.
 

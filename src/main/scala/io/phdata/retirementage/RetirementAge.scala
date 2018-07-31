@@ -16,6 +16,7 @@
 
 package io.phdata.retirementage
 
+import io.phdata.retirementage.domain.GlobalConfig
 import org.apache.spark.sql.SparkSession
 import org.rogach.scallop.ScallopConf
 
@@ -33,6 +34,8 @@ object RetirementAge {
     val yamlString: String = Source.fromFile(cliArgs.conf()).getLines().mkString("\n")
 
     val config = RetirementConfigParser.parse(yamlString)
+
+    GlobalConfig.kuduMasters = config.kudu_masters
 
     val retirementReport =
       SparkDriver.retire(config, cliArgs.computeCounts(), cliArgs.dryRun(), cliArgs.undo())

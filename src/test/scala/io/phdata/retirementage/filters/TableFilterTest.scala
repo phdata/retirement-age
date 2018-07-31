@@ -189,12 +189,12 @@ class TableFilterTest extends FunSuite with SparkTestBase {
 
       override lazy val currentFrame: DataFrame = frame
 
-      override def persistFrame(computeCountsFlag: Boolean,
-                                dryRun: Boolean,
-                                qualifiedTableName: String,
-                                storageType: String,
-                                currentFrame: DataFrame,
-                                filteredFrame: DataFrame): RetirementReport = {
+      override def removeRecords(computeCountsFlag: Boolean,
+                                 dryRun: Boolean,
+                                 qualifiedTableName: String,
+                                 storageType: String,
+                                 currentFrame: DataFrame,
+                                 filteredFrame: DataFrame): RetirementReport = {
 
         RetirementReport(
           qualifiedTableName,
@@ -223,12 +223,12 @@ class TableFilterTest extends FunSuite with SparkTestBase {
 
       override lazy val currentFrame: DataFrame = frame
 
-      override def persistFrame(computeCountsFlag: Boolean,
-                                dryRun: Boolean,
-                                qualifiedTableName: String,
-                                storageType: String,
-                                currentFrame: DataFrame,
-                                filteredFrame: DataFrame): RetirementReport = {
+      override def removeRecords(computeCountsFlag: Boolean,
+                                 dryRun: Boolean,
+                                 qualifiedTableName: String,
+                                 storageType: String,
+                                 currentFrame: DataFrame,
+                                 filteredFrame: DataFrame): RetirementReport = {
 
         RetirementReport(
           qualifiedTableName,
