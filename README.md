@@ -18,8 +18,7 @@
 # Retirement Age
 The Retirement Age data-lifecycle application is an open source solution for removing dataset records past an expiration date.
 It allows you to easily filter datasets stored in Parquet and Avro, using the Hive Metastore, or datasets stored in Kudu.
-Retirement Age helps to easily meet federal regulations or liability reasons for data retention while filtering out
-unneeded records or simply clean up old unused data.
+Retirement Age helps you to filter out data for liability reasons or to comply with regulations such as GDPR.
 
 [How Retirement Age works](#how-it-works).
 
