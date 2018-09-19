@@ -16,9 +16,10 @@
 
 package io.phdata.retirementage
 
+import com.amazonaws.services.kinesis.model.InvalidArgumentException
 import com.typesafe.scalalogging.LazyLogging
-import io.phdata.retirementage.domain.{Config, Database, DatedTable, RetirementReport}
-import io.phdata.retirementage.filters.{ChildTableFilter, DatedTableFilter, TableFilter}
+import io.phdata.retirementage.domain._
+import io.phdata.retirementage.filters._
 import io.phdata.retirementage.storage.{HdfsStorage, KuduStorage}
 import org.apache.spark.sql.SparkSession
 
@@ -64,12 +65,29 @@ object SparkDriver extends LazyLogging {
     }
   }
 
-  def getFilter(database: Database, table: DatedTable) = {
-    table.storage_type match {
-      case "parquet" => new DatedTableFilter(database, table) with HdfsStorage
-      case "avro"    => new DatedTableFilter(database, table) with HdfsStorage
-      case "kudu"    => new DatedTableFilter(database, table) with KuduStorage
-      case _         => throw new NotImplementedError()
+  def getFilter(database: Database, table: Table) = {
+    table match {
+      case d: DatedTable =>
+        d.storage_type match {
+          case "parquet" =>
+            new DatedTableFilter(database, d) with HdfsStorage
+          case "avro" =>
+            new DatedTableFilter(database, d) with HdfsStorage
+          case "kudu" =>
+            new DatedTableFilter(database, d) with KuduStorage
+          case _ => throw new NotImplementedError()
+        }
+      case c: CustomTable =>
+        c.storage_type match {
+          case "parquet" =>
+            new CustomTableFilter(database, c) with HdfsStorage
+          case "avro" =>
+            new CustomTableFilter(database, c) with HdfsStorage
+          case "kudu" =>
+            new CustomTableFilter(database, c) with KuduStorage
+          case _ => throw new NotImplementedError()
+        }
+
     }
   }
 }

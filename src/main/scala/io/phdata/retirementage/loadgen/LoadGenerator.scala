@@ -87,7 +87,7 @@ object LoadGenerator {
       case "kudu" =>
         val kuduContext =
           new KuduContext(GlobalConfig.kuduMasters.get.mkString(","), spark.sqlContext.sparkContext)
-        
+
         createKuduTable(kuduContext, conf.factName(), 10)
         kuduContext.insertRows(factDf, conf.factName())
 

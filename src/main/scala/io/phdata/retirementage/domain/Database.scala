@@ -16,4 +16,4 @@
 
 package io.phdata.retirementage.domain
 
-case class Database(val name: String, val tables: Seq[DatedTable])
+case class Database(val name: String, val tables: Seq[Table])

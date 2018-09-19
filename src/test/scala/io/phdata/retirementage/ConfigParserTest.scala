@@ -54,6 +54,14 @@ class ConfigParserTest extends FunSuite {
         |                join_on:
         |                  parent: col1
         |                  self: col1
+        |      - name: customTable1
+        |        storage_type: parquet
+        |        filters:
+        |          - filter: 'id = 1'
+        |        hold:
+        |          active: true
+        |          reason: "legal"
+        |          owner: random@random.io
       """.stripMargin
 
     val actual = RetirementConfigParser.parse(testFile)
@@ -84,7 +92,12 @@ class ConfigParserTest extends FunSuite {
                         ChildTable("parquet2", "parquet", JoinOn("col1", "col1"), None, None))))
                   )
                 )
-              )
+              ),
+              CustomTable("customTable1",
+                          "parquet",
+                          List(CustomFilter("id = 1")),
+                          Some(Hold(true, "legal", "random@random.io")),
+                          None)
             )
           ))
       )
