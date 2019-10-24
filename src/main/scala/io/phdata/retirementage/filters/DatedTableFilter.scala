@@ -17,10 +17,9 @@
 package io.phdata.retirementage.filters
 
 import io.phdata.retirementage.domain.{Database, DatedTable}
-import io.phdata.retirementage.storage.{HdfsStorage, StorageActions}
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types._
-import org.apache.spark.sql.{Column, DataFrame}
+import org.apache.spark.sql.{Column, DataFrame, Dataset, Row}
 
 import scala.util.{Failure, Success, Try}
 
@@ -43,7 +42,7 @@ abstract class DatedTableFilter(database: Database, table: DatedTable)
       .filter(date_add(dateExpression, table.expiration_days) < current_date())
       .cache()
 
-  override def filteredFrame() =
+  override def filteredFrame(): Dataset[Row] =
     currentFrame
       .filter(date_add(dateExpression, table.expiration_days) > current_date())
 

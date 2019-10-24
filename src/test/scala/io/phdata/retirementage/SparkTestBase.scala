@@ -22,7 +22,7 @@ import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.{Row, SparkSession}
 
 trait SparkTestBase {
-  val spark = SparkSession
+  lazy val spark = SparkSession
     .builder()
     .appName("retirement-age")
     .master("local[3]")

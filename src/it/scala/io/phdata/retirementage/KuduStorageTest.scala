@@ -7,14 +7,17 @@ import io.phdata.retirementage.filters.DatedTableFilter
 import io.phdata.retirementage.storage.KuduStorage
 import org.apache.kudu.client._
 import org.apache.kudu.spark.kudu._
+import org.apache.kudu.test.KuduTestHarness
 import org.apache.spark.sql.types._
 import org.scalatest.{BeforeAndAfter, FunSuite}
+
 import scala.collection.JavaConverters._
 
 class KuduStorageTest extends FunSuite with SparkTestBase with BeforeAndAfter {
-  GlobalConfig.kuduMasters = Some(List("localhost:7051"))
-  val kuduMaster  = GlobalConfig.kuduMasters.get.mkString(",")
-  val kuduContext = new KuduContext(kuduMaster, spark.sqlContext.sparkContext)
+
+  val harness = new KuduTestHarness()
+  var kuduMaster: String = _
+  var kuduContext: KuduContext = _
 
   var subTableName  = ""
   var dimTableName  = ""
@@ -31,6 +34,10 @@ class KuduStorageTest extends FunSuite with SparkTestBase with BeforeAndAfter {
   var factQualifiedTableName = ""
 
   before {
+    harness.before()
+    kuduMaster = harness.getMasterAddressesAsString
+    GlobalConfig.kuduMasters = Some(harness.getMasterServers.asScala.map(_.toString).toList)
+    kuduContext = new KuduContext(kuduMaster, spark.sqlContext.sparkContext)
     factTableName =
       createKuduTable(KuduObjects.defaultFactSchema, KuduObjects.defaultFactKey, kuduContext)
     dimTableName =
@@ -44,7 +51,7 @@ class KuduStorageTest extends FunSuite with SparkTestBase with BeforeAndAfter {
     factTable = DatedTable(factTableName, "kudu", "date", 1, None, None, Some(List(dimTable)))
     database = Database("impala::default", Seq(factTable))
 
-    insertKuduData(factTable, TestObjects.smallDatasetSeconds, KuduObjects.defaultFactSchema)
+    insertKuduData(factTable, KuduObjects.defaultFactData, KuduObjects.defaultFactSchema)
 
     insertKuduData(dimTable, KuduObjects.defaultDimData, KuduObjects.defaultDimSchema)
 
@@ -59,6 +66,7 @@ class KuduStorageTest extends FunSuite with SparkTestBase with BeforeAndAfter {
     kuduContext.deleteTable(factQualifiedTableName)
     kuduContext.deleteTable(dimQualifiedTableName)
     kuduContext.deleteTable(subQualifiedTableName)
+    harness.after()
   }
 
   test("don't make changes on a dry run") {

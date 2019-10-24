@@ -3,14 +3,27 @@ package io.phdata.retirementage
 import io.phdata.retirementage.domain.GlobalConfig
 import io.phdata.retirementage.loadgen.{LoadGenerator, LoadGeneratorConfig}
 import org.apache.kudu.spark.kudu._
+import org.apache.kudu.test.KuduTestHarness
 import org.apache.spark.sql.SparkSession
-import org.scalatest.FunSuite
+import org.scalatest.{BeforeAndAfter, FunSuite}
 
-class KuduLoadGeneratorTest extends FunSuite with SparkTestBase {
-  GlobalConfig.kuduMasters = Some(List("localhost:7051"))
-  val kuduMaster = GlobalConfig.kuduMasters.get.mkString(",")
-  val kuduContext =
-    new KuduContext(kuduMaster, spark.sqlContext.sparkContext)
+import scala.collection.JavaConverters._
+
+class KuduLoadGeneratorTest extends FunSuite with SparkTestBase with BeforeAndAfter {
+  private val harness = new KuduTestHarness()
+  private var kuduMaster: String = _
+  private var kuduContext: KuduContext = _
+
+  before {
+    harness.before()
+    GlobalConfig.kuduMasters = Some(harness.getMasterServers.asScala.map(_.toString).toList)
+    kuduMaster = harness.getMasterAddressesAsString
+    kuduContext = new KuduContext(kuduMaster, spark.sqlContext.sparkContext)
+  }
+
+  after {
+    harness.after()
+  }
 
   def confSetup(factNum: Int, dimNum: Int, subNum: Int): LoadGeneratorConfig = {
     val confArgs = Array("--fact-count",

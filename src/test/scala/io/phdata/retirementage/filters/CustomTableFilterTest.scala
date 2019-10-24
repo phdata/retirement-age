@@ -11,11 +11,11 @@ import java.sql.Date
 class CustomTableFilterTest extends FunSuite with SparkTestBase {
   test("Filter out a date when column is unix time seconds") {
 
-    val testFilter = CustomFilter(s"date = ${Date.valueOf("2018-12-25").getTime / 1000}")
+    val testFilter = CustomFilter(s"date = ${TestObjects.today.getMillis / 1000}")
 
     val table    = CustomTable("table1", "parquet", List(testFilter), None, None)
     val database = Database("default", Seq(table))
-    val schema   = StructType(StructField("date", LongType, false) :: Nil)
+    val schema   = StructType(StructField("date", LongType, nullable = false) :: Nil)
     val data     = TestObjects.smallDatasetSeconds
 
     val df = createDataFrame(TestObjects.smallDatasetSeconds, schema)

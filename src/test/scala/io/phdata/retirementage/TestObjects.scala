@@ -16,27 +16,23 @@
 
 package io.phdata.retirementage
 
-import java.sql.Date
+import org.joda.time.DateTime
 
 object TestObjects {
+  val today: DateTime = DateTime.now
   val smallDatasetSeconds =
-    List(List(Date.valueOf("2018-12-25").getTime / 1000),
-         List(Date.valueOf("2017-12-25").getTime / 1000),
-         List(Date.valueOf("2016-12-25").getTime / 1000))
+    List(List(today.getMillis / 1000),
+         List(today.minusYears(1).getMillis / 1000),
+         List(today.minusYears(2).getMillis / 1000))
 
   val smallDatasetMillis =
-    List(List(Date.valueOf("2018-12-25").getTime),
-         List(Date.valueOf("2017-12-25").getTime),
-         List(Date.valueOf("2016-12-25").getTime))
+    List(List(today.getMillis),
+         List(today.minusYears(1).getMillis),
+         List(today.minusYears(2).getMillis))
 
-  val smallDatasetString =
-    List(List(Date.valueOf("2018-12-25")),
-         List(Date.valueOf("2017-12-25")),
-         List(Date.valueOf("2016-12-25")))
-
-  val parentDataset = List(List(1L, Date.valueOf("2018-12-25").getTime / 1000),
-                           List(2L, Date.valueOf("2017-12-25").getTime / 1000),
-                           List(3L, Date.valueOf("2016-12-25").getTime / 1000))
+  val parentDataset = List(List(1L, today.getMillis / 1000),
+                           List(2L, today.minusYears(1).getMillis / 1000),
+                           List(3L, today.minusYears(2).getMillis / 1000))
 
   val childDataset = List(List(1L, "record1"), List(2L, "record2"), List(3L, "record3"))
 }
