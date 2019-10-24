@@ -16,10 +16,8 @@
 
 package io.phdata.retirementage.filters
 
-import io.phdata.retirementage.domain.{ChildTable, Database}
-import io.phdata.retirementage.storage.{HdfsStorage, StorageActions}
-import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions.col
+import io.phdata.retirementage.domain.{ChildTable, Database, JoinOn}
+import org.apache.spark.sql.{Column, DataFrame}
 
 /**
   * Filter for a dataset not containing a date column but that is joined from a table that does.
@@ -29,30 +27,34 @@ import org.apache.spark.sql.functions.col
 abstract class ChildTableFilter(database: Database, table: ChildTable, parent: TableFilter)
     extends TableFilter(database, table) {
 
-  override def filteredFrame = {
-    val joinKeys = table.join_on
-
-    currentFrame
-      .join(parent.expiredRecords(),
-            currentFrame.col(joinKeys.self)
-              === parent.expiredRecords.col(joinKeys.parent),
-            "leftanti")
+  override def filteredFrame(): DataFrame = {
+    filter("leftanti")
   }
 
   /**
     * @inheritdoc
     */
-  override def hasExpiredRecords(): Boolean =
-    expiredRecords().count() > 0
+  override def hasExpiredRecords(): Boolean = !expiredRecords().rdd.isEmpty()
 
   /**
     * @inheritdoc
     */
   override def expiredRecords(): DataFrame = {
-    val joinKeys = table.join_on
-    currentFrame.join(
-      parent.expiredRecords(),
-      currentFrame.col(joinKeys.self) === parent.expiredRecords.col(joinKeys.parent),
-      "inner")
+    filter("leftsemi")
+  }
+
+  private[filters] def filter(joinType: String): DataFrame = {
+    val joinExpr = joinExpression(table.join_on)
+
+    currentFrame.join(parent.expiredRecords(), joinExpr, joinType)
+  }
+
+  private[filters] def joinExpression(joins: List[JoinOn]): Column = {
+    joins
+      .map(
+        joinKeys =>
+          currentFrame(joinKeys.self) === parent
+            .expiredRecords()(joinKeys.parent))
+      .reduceLeft(_ && _)
   }
 }

@@ -46,14 +46,16 @@ class ConfigParserTest extends FunSuite {
         |          - name: parquet2
         |            storage_type: parquet
         |            join_on:
-        |              parent: col1
-        |              self: col1
+        |              - parent: col1
+        |                self: col1
+        |              - parent: col2
+        |                self: col2
         |            child_tables:
         |              - name: parquet2
         |                storage_type: parquet
         |                join_on:
-        |                  parent: col1
-        |                  self: col1
+        |                  - parent: col1
+        |                    self: col1
         |      - name: customTable1
         |        storage_type: parquet
         |        filters:
@@ -86,10 +88,16 @@ class ConfigParserTest extends FunSuite {
                     ChildTable(
                       "parquet2",
                       "parquet",
-                      JoinOn("col1", "col1"),
+                      List(JoinOn("col1", "col1"), JoinOn("col2", "col2")),
                       None,
-                      Some(List(
-                        ChildTable("parquet2", "parquet", JoinOn("col1", "col1"), None, None))))
+                      Some(
+                        List(
+                          ChildTable("parquet2",
+                                     "parquet",
+                                     List(JoinOn("col1", "col1")),
+                                     None,
+                                     None)))
+                    )
                   )
                 )
               ),

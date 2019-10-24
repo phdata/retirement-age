@@ -106,7 +106,8 @@ class TableFilterTest extends FunSuite with SparkTestBase {
     val parentTableName = writeTestTable(TestObjects.parentDataset, parentSchema)
     val childTableName  = writeTestTable(TestObjects.childDataset, childSchema)
 
-    val child = ChildTable(childTableName, "parquet", JoinOn("parentKey", "childKey"), None, None)
+    val child =
+      ChildTable(childTableName, "parquet", List(JoinOn("parentKey", "childKey")), None, None)
 
     val parent =
       DatedTable(parentTableName, "parquet", "date", 1, None, None, Some(List(child)))
@@ -134,7 +135,7 @@ class TableFilterTest extends FunSuite with SparkTestBase {
 
     val child = ChildTable(childTableName,
                            "parquet",
-                           JoinOn("parentKey", "childKey"),
+                           List(JoinOn("parentKey", "childKey")),
                            Some(Hold(true, "legal", "legal@client.biz")),
                            None)
 
@@ -161,7 +162,8 @@ class TableFilterTest extends FunSuite with SparkTestBase {
     val parentTableName = writeTestTable(TestObjects.parentDataset, parentSchema)
     val childTableName  = writeTestTable(TestObjects.childDataset, childSchema)
 
-    val child = ChildTable(childTableName, "parquet", JoinOn("parentKey", "childKey"), None, None)
+    val child =
+      ChildTable(childTableName, "parquet", List(JoinOn("parentKey", "childKey")), None, None)
 
     val table =
       DatedTable(parentTableName, "parquet", "date", 1, None, None, Some(List(child)))

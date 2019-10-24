@@ -4,8 +4,8 @@ import io.phdata.retirementage.domain.JoinOn
 import org.apache.spark.sql.types.{LongType, StringType, StructField, StructType}
 
 object KuduObjects {
-  val defaultFactJoin = JoinOn("date", "date")
-  val defaultDimJoin  = JoinOn("id", "id")
+  val defaultFactJoin = List(JoinOn("date", "date"))
+  val defaultDimJoin  = List(JoinOn("id", "id"), JoinOn("date", "dim_date"))
 
   // Default fact objects
   val defaultFactSchema = StructType(StructField("date", LongType, nullable = false) :: Nil)
@@ -25,9 +25,14 @@ object KuduObjects {
 
   //Default sub-dimension objects
   val defaultSubSchema = StructType(
-    StructField("sub_id", StringType, nullable = false) :: StructField("id", StringType, nullable = false) :: Nil)
+    StructField("sub_id", StringType, nullable = false) ::
+      StructField("id", StringType, nullable = false) ::
+      StructField("dim_date", LongType, nullable = false) ::
+      Nil)
 
   val defaultSubKey: Seq[String] = Seq("sub_id")
 
-  val defaultSubData = List(List("10", "1"), List("20", "2"), List("30", "3"))
+  val defaultSubData = List(List("10", "1", TestObjects.today.getMillis / 1000),
+                            List("20", "2", TestObjects.today.minusYears(1).getMillis / 1000),
+                            List("30", "3", TestObjects.today.minusYears(2).getMillis / 1000))
 }

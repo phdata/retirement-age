@@ -18,7 +18,7 @@ package io.phdata.retirementage.domain
 
 case class ChildTable(name: String,
                       storage_type: String,
-                      join_on: JoinOn,
+                      join_on: List[JoinOn],
                       hold: Option[Hold],
                       child_tables: Option[List[ChildTable]])
     extends Table
