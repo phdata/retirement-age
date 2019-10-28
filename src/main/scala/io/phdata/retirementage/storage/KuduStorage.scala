@@ -2,15 +2,17 @@
 
 package io.phdata.retirementage.storage
 
-import io.phdata.retirementage.domain.RetirementReport
 import com.typesafe.scalalogging.LazyLogging
-import org.apache.spark.sql.DataFrame
 import io.phdata.retirementage.SparkDriver.spark
-import io.phdata.retirementage.domain.{DatasetReport, RetirementReport}
+import io.phdata.retirementage.domain.{DatasetReport, GlobalConfig, RetirementReport}
 import org.apache.kudu.spark.kudu._
-import io.phdata.retirementage.domain.GlobalConfig
+import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.functions._
+
+import scala.collection.JavaConversions._
 
 trait KuduStorage extends StorageActions with LazyLogging {
+
   override def getCurrentFrame(tableName: String): DataFrame = {
     // Add correct exception to be thrown
     val kuduMasters = GlobalConfig.kuduMasters
@@ -41,15 +43,14 @@ trait KuduStorage extends StorageActions with LazyLogging {
 
       if (!dryRun) {
         logger.info(s"deleting expired rows in $qualifiedTableName")
-        val primaryKey = kuduContext.syncClient
+        val primaryKeys = kuduContext.syncClient
           .openTable(qualifiedTableName)
           .getSchema
-          .getPrimaryKeyColumns()
-          .get(0)
-          .getName
-        // Selecting keys to delete from the kudu table
-        val filteredKeys = filteredFrame.select(primaryKey)
+          .getPrimaryKeyColumns
+          .map(k => col(k.getName))
 
+        // Selecting keys to delete from the kudu table
+        val filteredKeys = filteredFrame.select(primaryKeys: _*)
         kuduContext.deleteRows(filteredKeys, qualifiedTableName)
 
         RetirementReport(qualifiedTableName,

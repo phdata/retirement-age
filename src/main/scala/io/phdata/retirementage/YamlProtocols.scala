@@ -18,12 +18,15 @@ package io.phdata.retirementage
 
 import io.phdata.retirementage.domain._
 import net.jcazevedo.moultingyaml._
+import org.slf4j.LoggerFactory
 
 /**
   * Yaml protocols for parsing yaml configuration into domain objects using MoultingYaml.
   *
   */
 object YamlProtocols extends DefaultYamlProtocol {
+  private val log = LoggerFactory.getLogger(YamlProtocols.getClass.getName)
+
   implicit val joinKeys = yamlFormat2(JoinOn)
   // Make the yamlformat lazy to allow for recursive Table types
   implicit val datedTable: YamlFormat[DatedTable]   = lazyFormat(yamlFormat7(DatedTable))
@@ -72,7 +75,10 @@ object YamlProtocols extends DefaultYamlProtocol {
       try {
         value.asYamlObject.convertTo[DatedTable]
       } catch {
-        case _: Throwable => value.asYamlObject.convertTo[CustomTable]
+        case t: Throwable =>
+          log.debug("Error parsing config as DatedTable", t)
+          log.warn(s"Unable to read table config as DatedTable, attempting CustomTable: $value")
+          value.asYamlObject.convertTo[CustomTable]
       }
 
     }

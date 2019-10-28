@@ -112,5 +112,4 @@ class ConfigParserTest extends FunSuite {
 
     assertResult(expected)(actual)
   }
-
 }

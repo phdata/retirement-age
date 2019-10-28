@@ -10,18 +10,22 @@ object KuduObjects {
   // Default fact objects
   val defaultFactSchema = StructType(StructField("date", LongType, nullable = false) :: Nil)
 
-  val defaultFactKey: Seq[String] = Seq("date")
+  val defaultFactKey: Seq[String]       = Seq("date")
   val defaultFactData: List[List[Long]] = TestObjects.smallDatasetSeconds
 
   // Default dimension objects
   val defaultDimSchema = StructType(
-    StructField("id", StringType, nullable = false) :: StructField("date", LongType, nullable = false) :: Nil)
+    StructField("id", StringType, nullable = false) :: StructField("date",
+                                                                   LongType,
+                                                                   nullable = false) :: Nil)
 
   val defaultDimKey: Seq[String] = Seq("id")
 
-  val defaultDimData = List(List("1", TestObjects.today.getMillis / 1000),
-                            List("2", TestObjects.today.minusYears(1).getMillis / 1000),
-                            List("3", TestObjects.today.minusYears(2).getMillis / 1000))
+  val defaultDimData = List(
+    List("1", TestObjects.today.getMillis / 1000),
+    List("2", TestObjects.today.minusYears(1).getMillis / 1000),
+    List("3", TestObjects.today.minusYears(2).getMillis / 1000)
+  )
 
   //Default sub-dimension objects
   val defaultSubSchema = StructType(
@@ -30,9 +34,11 @@ object KuduObjects {
       StructField("dim_date", LongType, nullable = false) ::
       Nil)
 
-  val defaultSubKey: Seq[String] = Seq("sub_id")
+  val defaultSubKey: Seq[String] = Seq("sub_id", "id")
 
-  val defaultSubData = List(List("10", "1", TestObjects.today.getMillis / 1000),
-                            List("20", "2", TestObjects.today.minusYears(1).getMillis / 1000),
-                            List("30", "3", TestObjects.today.minusYears(2).getMillis / 1000))
+  val defaultSubData = List(
+    List("10", "1", TestObjects.today.getMillis / 1000),
+    List("20", "2", TestObjects.today.minusYears(1).getMillis / 1000),
+    List("30", "3", TestObjects.today.minusYears(2).getMillis / 1000)
+  )
 }

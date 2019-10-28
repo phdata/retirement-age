@@ -9,9 +9,9 @@ import org.scalatest.{BeforeAndAfter, FunSuite}
 
 import scala.collection.JavaConverters._
 
-class KuduLoadGeneratorTest extends FunSuite with SparkTestBase with BeforeAndAfter {
-  private val harness = new KuduTestHarness()
-  private var kuduMaster: String = _
+class KuduLoadGeneratorITest extends FunSuite with SparkTestBase with BeforeAndAfter {
+  private val harness                  = new KuduTestHarness()
+  private var kuduMaster: String       = _
   private var kuduContext: KuduContext = _
 
   before {

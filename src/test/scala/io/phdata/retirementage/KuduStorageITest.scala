@@ -13,10 +13,10 @@ import org.scalatest.{BeforeAndAfter, FunSuite}
 
 import scala.collection.JavaConverters._
 
-class KuduStorageTest extends FunSuite with SparkTestBase with BeforeAndAfter {
+class KuduStorageITest extends FunSuite with SparkTestBase with BeforeAndAfter {
 
-  val harness = new KuduTestHarness()
-  var kuduMaster: String = _
+  val harness                  = new KuduTestHarness()
+  var kuduMaster: String       = _
   var kuduContext: KuduContext = _
 
   var subTableName  = ""

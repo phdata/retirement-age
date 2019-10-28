@@ -3,22 +3,24 @@ package io.phdata.retirementage.filters
 import com.amazonaws.services.kinesis.model.InvalidArgumentException
 import io.phdata.retirementage.domain.{CustomTable, Database}
 import org.apache.spark.sql.DataFrame
-import org.apache.spark.sql.functions._
+import org.slf4j.LoggerFactory
 
 abstract class CustomTableFilter(database: Database, table: CustomTable)
     extends TableFilter(database, table) {
+  private[filters] val log = LoggerFactory.getLogger(classOf[CustomTableFilter])
 
   override def expiredRecords(): DataFrame = {
     currentFrame.except(filteredFrame())
   }
 
-  override def filteredFrame() = {
+  // TODO: this is wrong
+  override def filteredFrame(): DataFrame = {
     try {
       var tempFrame = currentFrame
       for (i <- table.filters) {
         val query = s"SELECT * FROM tempFrame WHERE NOT ${i.filter}"
         tempFrame.createOrReplaceTempView("tempFrame")
-        log(s"Executing SQL Query: " + query)
+        log.info(s"Executing SQL Query: " + query)
         tempFrame = tempFrame.sqlContext.sql(query)
       }
       tempFrame
@@ -27,5 +29,5 @@ abstract class CustomTableFilter(database: Database, table: CustomTable)
     }
   }
 
-  override def hasExpiredRecords(): Boolean = true
+  override def hasExpiredRecords(): Boolean = !filteredFrame().rdd.isEmpty()
 }

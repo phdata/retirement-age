@@ -26,7 +26,7 @@ class CustomTableFilterTest extends FunSuite with SparkTestBase {
     assertResult(2)(filter.newDatasetCount())
   }
 
-  def getCustomFrameFilter(database: Database, table: CustomTable, frame: DataFrame) = {
+  private def getCustomFrameFilter(database: Database, table: CustomTable, frame: DataFrame) = {
     class TestTableFilter(database: Database, table: CustomTable)
         extends CustomTableFilter(database, table)
         with HdfsStorage {

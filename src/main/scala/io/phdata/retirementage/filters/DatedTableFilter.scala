@@ -68,8 +68,7 @@ abstract class DatedTableFilter(database: Database, table: DatedTable)
     * @return
     */
   def getDateExpression(df: DataFrame, dateColumn: String, stringFormat: Option[String]): Column = {
-    val dateColumnType: Try[DataType] = Try(
-      df.schema.filter(f => f.name == dateColumn).head.dataType)
+    val dateColumnType: Try[DataType] = Try(df.schema(dateColumn).dataType)
 
     val dateExpression = dateColumnType match {
       case Success(StringType) =>
@@ -85,10 +84,9 @@ abstract class DatedTableFilter(database: Database, table: DatedTable)
           case 13 => from_unixtime((col(dateColumn) / 1000).cast(LongType)) // milliseconds
           case 10 => from_unixtime(col(dateColumn)) // seconds
         }
-      case Success(TimestampType) =>
-        col(dateColumn).cast(DateType)
-      case Success(_) => throw new IllegalArgumentException("Date expression not recognized.")
-      case Failure(e) => throw e
+      case Success(TimestampType) => col(dateColumn).cast(DateType)
+      case Success(_)             => throw new IllegalArgumentException("Date expression not recognized.")
+      case Failure(e)             => throw e
     }
     dateExpression
   }
