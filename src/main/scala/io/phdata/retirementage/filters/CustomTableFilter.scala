@@ -29,5 +29,5 @@ abstract class CustomTableFilter(database: Database, table: CustomTable)
     }
   }
 
-  override def hasExpiredRecords(): Boolean = !filteredFrame().rdd.isEmpty()
+  override def hasExpiredRecords(): Boolean = !expiredRecords().rdd.isEmpty()
 }

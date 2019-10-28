@@ -16,7 +16,6 @@ class CustomTableFilterTest extends FunSuite with SparkTestBase {
     val table    = CustomTable("table1", "parquet", List(testFilter), None, None)
     val database = Database("default", Seq(table))
     val schema   = StructType(StructField("date", LongType, nullable = false) :: Nil)
-    val data     = TestObjects.smallDatasetSeconds
 
     val df = createDataFrame(TestObjects.smallDatasetSeconds, schema)
 
@@ -24,6 +23,21 @@ class CustomTableFilterTest extends FunSuite with SparkTestBase {
 
     assertResult(1)(filter.expiredRecordsCount())
     assertResult(2)(filter.newDatasetCount())
+  }
+
+  test("hasExpiredRecords() returns false when there are no records to be removed") {
+
+    val testFilter = CustomFilter(s"date = ${TestObjects.today.plusYears(1).getMillis / 1000}")
+
+    val table    = CustomTable("table1", "parquet", List(testFilter), None, None)
+    val database = Database("default", Seq(table))
+    val schema   = StructType(StructField("date", LongType, nullable = false) :: Nil)
+
+    val df = createDataFrame(TestObjects.smallDatasetSeconds, schema)
+
+    val filter = getCustomFrameFilter(database, table, df)
+
+    assertResult(false)(filter.hasExpiredRecords())
   }
 
   private def getCustomFrameFilter(database: Database, table: CustomTable, frame: DataFrame) = {
