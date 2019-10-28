@@ -36,8 +36,14 @@ lazy val root = (project in file("."))
             s"$artifactoryUrl/libs-snapshot-local;build.timestamp=" + new java.util.Date().getTime))
       else
         Some("phData Releases".at(s"$artifactoryUrl/libs-release-local"))
+    },
+    artifact in (Compile, assembly) := {
+      val art = (artifact in (Compile, assembly)).value
+      art.withClassifier(Some("assembly"))
     }
   )
+
+addArtifact(artifact in (Compile, assembly), assembly)
 
 val sparkVersion     = "2.2.0.cloudera1"
 val scalaTestVersion = "3.0.4"
