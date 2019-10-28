@@ -31,7 +31,9 @@ lazy val root = (project in file("."))
     credentials += Credentials(Path.userHome / ".sbt" / ".credentials"),
     publishTo := {
       if (version.value.endsWith("SNAPSHOT"))
-        Some("phData Snapshots".at(s"$artifactoryUrl/libs-snapshot-local;build.timestamp=" + new java.util.Date().getTime))
+        Some(
+          "phData Snapshots".at(
+            s"$artifactoryUrl/libs-snapshot-local;build.timestamp=" + new java.util.Date().getTime))
       else
         Some("phData Releases".at(s"$artifactoryUrl/libs-release-local"))
     }
@@ -40,7 +42,7 @@ lazy val root = (project in file("."))
 val sparkVersion     = "2.2.0.cloudera1"
 val scalaTestVersion = "3.0.4"
 val kuduVersion      = "1.9.0"
-val artifactoryUrl = "https://repository.phdata.io/artifactory"
+val artifactoryUrl   = "https://repository.phdata.io/artifactory"
 
 parallelExecution in Test := false
 val scalaV = "2.11.8"
@@ -69,4 +71,3 @@ val otherDependencies = Seq(
   _.excludeAll(ExclusionRule(organization = "com.fasterxml.jackson.core"),
                ExclusionRule(organization = "org.apache.logging.log4j"),
                ExclusionRule(organization = "log4j")))
-
