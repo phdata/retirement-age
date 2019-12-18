@@ -19,10 +19,14 @@ package io.phdata.retirementage
 import io.phdata.retirementage.domain.GlobalConfig
 import org.apache.spark.sql.SparkSession
 import org.rogach.scallop.ScallopConf
+import org.slf4j.LoggerFactory
 
 import scala.io.Source
 
 object RetirementAge {
+
+  private val log = LoggerFactory.getLogger(this.getClass)
+
   def main(args: Array[String]): Unit = {
     val spark = SparkSession
       .builder()
@@ -40,7 +44,9 @@ object RetirementAge {
     val retirementReport =
       SparkDriver.retire(config, cliArgs.computeCounts(), cliArgs.dryRun(), cliArgs.undo())
 
-    println(Reporting.toYaml(retirementReport))
+    log.debug("retirement report: {}", retirementReport)
+
+    log.info(Reporting.toYaml(retirementReport))
   }
 
   private class CliArgsParser(args: Seq[String]) extends ScallopConf(args) {
