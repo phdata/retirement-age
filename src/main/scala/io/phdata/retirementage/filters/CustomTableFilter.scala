@@ -14,18 +14,14 @@ abstract class CustomTableFilter(database: Database, table: CustomTable)
   }
 
   override def filteredFrame(): DataFrame = {
-    try {
-      var tempFrame = currentFrame
-      for (i <- table.filters) {
-        val query = s"SELECT * FROM tempFrame WHERE NOT ${i.filter}"
-        tempFrame.createOrReplaceTempView("tempFrame")
-        log.info(s"Executing SQL Query: " + query)
-        tempFrame = tempFrame.sqlContext.sql(query)
-      }
-      tempFrame
-    } catch {
-      case t: Throwable => log.error(t.getMessage, t)
+    var tempFrame = currentFrame
+    for (i <- table.filters) {
+      val query = s"SELECT * FROM tempFrame WHERE NOT ${i.filter}"
+      tempFrame.createOrReplaceTempView("tempFrame")
+      log.info(s"Executing SQL Query: " + query)
+      tempFrame = tempFrame.sqlContext.sql(query)
     }
+    tempFrame
   }
 
   override def hasExpiredRecords(): Boolean = !expiredRecords().rdd.isEmpty()
