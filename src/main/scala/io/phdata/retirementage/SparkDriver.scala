@@ -43,6 +43,14 @@ object SparkDriver extends LazyLogging {
       database.tables.flatMap { table =>
         val hold                = table.hold.map(_.active).getOrElse(false)
         val filter: TableFilter = getFilter(database, table)
+        table match {
+          case ct: CustomTable =>
+            logger.info(s"Table name: ${filter.qualifiedTableName}\tfilters: ${ct.filters}")
+          case dt: DatedTable =>
+            logger.info(
+              s"Table name: ${filter.qualifiedTableName}\tfilters: ${dt.expiration_column} [${dt.expiration_days} days]")
+          case t => logger.error(s"Unknown table type: $t")
+        }
 
         try {
           if (undoFlag) {

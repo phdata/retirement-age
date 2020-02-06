@@ -33,8 +33,8 @@ abstract class TableFilter(database: Database, table: Table)
     extends StorageActions
     with LazyLogging {
 
-  val currentFrame: DataFrame    = getCurrentFrame(qualifiedTableName)
-  val qualifiedTableName: String = setQualifiedName(database, table)
+  lazy val currentFrame: DataFrame = getCurrentFrame(qualifiedTableName)
+  val qualifiedTableName: String   = setQualifiedName(database, table)
 
   /**
     * Returns the qualified table name for a given database and table.
