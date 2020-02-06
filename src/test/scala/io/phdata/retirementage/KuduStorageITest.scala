@@ -10,6 +10,7 @@ import org.apache.kudu.spark.kudu._
 import org.apache.kudu.test.KuduTestHarness
 import org.apache.spark.sql.types._
 import org.scalatest.{BeforeAndAfter, FunSuite}
+import org.scalatest.Matchers._
 
 import scala.collection.JavaConverters._
 
@@ -73,7 +74,8 @@ class KuduStorageITest extends FunSuite with SparkTestBase with BeforeAndAfter {
     // When
     val SUT = new DatedTableFilter(database, factTable) with KuduStorage
 
-    SUT.doFilter(computeCountsFlag = false, dryRun = true)
+    val result = SUT.doFilter(computeCountsFlag = false, dryRun = true)
+    println(Reporting.toYaml(result))
     // Then
     val actual =
       spark.sqlContext.read
@@ -87,7 +89,8 @@ class KuduStorageITest extends FunSuite with SparkTestBase with BeforeAndAfter {
     // When
     val SUT = new DatedTableFilter(database, factTable) with KuduStorage
 
-    SUT.doFilter(computeCountsFlag = true, dryRun = false)
+    val result = SUT.doFilter(computeCountsFlag = true, dryRun = false)
+    println(Reporting.toYaml(result))
     // Then
     val actual =
       spark.sqlContext.read
@@ -101,7 +104,8 @@ class KuduStorageITest extends FunSuite with SparkTestBase with BeforeAndAfter {
     // When
     val SUT = new DatedTableFilter(database, factTable) with KuduStorage
 
-    SUT.doFilter(computeCountsFlag = false)
+    val result = SUT.doFilter(computeCountsFlag = false)
+    println(Reporting.toYaml(result))
     // Then
     val actual =
       spark.sqlContext.read
@@ -115,7 +119,8 @@ class KuduStorageITest extends FunSuite with SparkTestBase with BeforeAndAfter {
     // When
     val SUT = new DatedTableFilter(database, factTable) with KuduStorage
 
-    SUT.doFilter(computeCountsFlag = false)
+    val report = SUT.doFilter(computeCountsFlag = false)
+    println(Reporting.toYaml(report))
     // Then
     val actual =
       spark.sqlContext.read
@@ -150,7 +155,8 @@ class KuduStorageITest extends FunSuite with SparkTestBase with BeforeAndAfter {
     // When
     val SUT = new DatedTableFilter(databaseTemp, factTableTemp) with KuduStorage
 
-    SUT.doFilter(computeCountsFlag = false)
+    val result = SUT.doFilter(computeCountsFlag = false)
+    println(Reporting.toYaml(result))
     // Then
     val resultDf =
       spark.sqlContext.read
@@ -158,6 +164,14 @@ class KuduStorageITest extends FunSuite with SparkTestBase with BeforeAndAfter {
         .kudu
 
     assertResult(3)(resultDf.count())
+  }
+
+  test("don't return null on missing table") {
+    val table = DatedTable("foo", "kudu", "bar", 1, None, None, None)
+    val SUT = new DatedTableFilter(Database("impala::nonexisting", Seq(table)), table)
+    with KuduStorage
+    val result = SUT.doFilter(computeCountsFlag = true)
+    result.head.originalDataset shouldNot be(null)
   }
 
   /*

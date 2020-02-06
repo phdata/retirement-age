@@ -13,7 +13,6 @@ abstract class CustomTableFilter(database: Database, table: CustomTable)
     currentFrame.except(filteredFrame())
   }
 
-  // TODO: this is wrong
   override def filteredFrame(): DataFrame = {
     try {
       var tempFrame = currentFrame
@@ -25,7 +24,7 @@ abstract class CustomTableFilter(database: Database, table: CustomTable)
       }
       tempFrame
     } catch {
-      case _: Throwable => throw new InvalidArgumentException("No filters found")
+      case t: Throwable => log.error(t.getMessage, t)
     }
   }
 

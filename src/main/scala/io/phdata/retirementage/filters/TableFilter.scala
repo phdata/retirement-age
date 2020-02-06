@@ -33,8 +33,8 @@ abstract class TableFilter(database: Database, table: Table)
     extends StorageActions
     with LazyLogging {
 
-  lazy val currentFrame: DataFrame = getCurrentFrame(qualifiedTableName)
-  val qualifiedTableName: String   = setQualifiedName(database, table)
+  val currentFrame: DataFrame    = getCurrentFrame(qualifiedTableName)
+  val qualifiedTableName: String = setQualifiedName(database, table)
 
   /**
     * Returns the qualified table name for a given database and table.
@@ -123,6 +123,7 @@ abstract class TableFilter(database: Database, table: Table)
         childFilter.doFilter(computeCountsFlag, dryRun)
 
       }
+      currentFrame
       val thisResult = this match {
         case _: KuduStorage =>
           removeRecords(computeCountsFlag,

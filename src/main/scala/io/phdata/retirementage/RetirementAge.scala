@@ -44,7 +44,7 @@ object RetirementAge {
     val retirementReport =
       SparkDriver.retire(config, cliArgs.computeCounts(), cliArgs.dryRun(), cliArgs.undo())
 
-    log.debug("retirement report: {}", retirementReport)
+    println("retirement report: {}", retirementReport)
 
     log.info(Reporting.toYaml(retirementReport))
   }

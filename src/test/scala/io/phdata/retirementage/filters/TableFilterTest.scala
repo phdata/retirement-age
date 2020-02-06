@@ -189,7 +189,7 @@ class TableFilterTest extends FunSuite with SparkTestBase {
         extends DatedTableFilter(database, table)
         with HdfsStorage {
 
-      override lazy val currentFrame: DataFrame = frame
+      override val currentFrame: DataFrame = frame
 
       override def removeRecords(computeCountsFlag: Boolean,
                                  dryRun: Boolean,
@@ -223,7 +223,7 @@ class TableFilterTest extends FunSuite with SparkTestBase {
         extends ChildTableFilter(database, table, parent)
         with HdfsStorage {
 
-      override lazy val currentFrame: DataFrame = frame
+      override val currentFrame: DataFrame = frame
 
       override def removeRecords(computeCountsFlag: Boolean,
                                  dryRun: Boolean,

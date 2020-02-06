@@ -217,7 +217,7 @@ class HdfsStorageTest extends FunSuite with SparkTestBase {
         extends DatedTableFilter(database, table)
         with HdfsStorage {
 
-      override lazy val currentFrame: DataFrame = frame
+      override val currentFrame: DataFrame = frame
 
     }
 

@@ -4,7 +4,7 @@ import sbt._
 
 ThisBuild / organization := "io.phdata"
 ThisBuild / scalaVersion := scalaV
-ThisBuild / version := "0.1-RC2"
+ThisBuild / version := "0.1-SNAPSHOT"
 
 lazy val IntTest = config("it") extend (Test)
 
